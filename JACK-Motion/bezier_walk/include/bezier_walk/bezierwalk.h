@@ -7,8 +7,9 @@
 #include <boost/chrono.hpp>
 #include <ros/callback_queue.h>
 #include <jack_framework_common/motion_module.h>
+#include <bezier_walk/IKSolver.h>
 
-#include "std_msgs/Float64.h"
+#include <std_msgs/Float64.h>
 
 #include <eigen3/Eigen/Eigen>
 #include <Eigen/Dense>
@@ -30,6 +31,7 @@ public:
     void initialize();
 
 private:
+    IKSolver ik;
     void queueThread();
     void servoPublish();
     boost::thread queue_thread_;
