@@ -62,6 +62,7 @@
         "typeinfo": "cpp",
         "dense": "cpp",
         "eigen": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "geometry": "cpp"
     }
 }
