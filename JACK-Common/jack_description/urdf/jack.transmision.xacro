@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="jack_joint" params="name axis parent child origin_xyz">
+    <joint name="${name}" type="revolute">
+      <axis xyz="${axis}" />
+      <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5" />
+      <origin rpy="0 0 0" xyz="${origin_xyz}" />
+      <parent link="${parent}" />
+      <child link="${child}" />
+    </joint>
+    <transmission name="t_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="m_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+  </xacro:macro>
+</robot>

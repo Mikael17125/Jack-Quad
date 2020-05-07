@@ -1,0 +1,39 @@
+jack:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Position Controllers ---------------------------------------
+  fr_coxa:
+    type: effort_controllers/JointPositionController
+    joint: frbase_coxa
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  fl_coxa:
+    type: effort_controllers/JointPositionController
+    joint: flbase_coxa
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  br_coxa:
+    type: effort_controllers/JointPositionController
+    joint: brbase_coxa
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  bl_coxa:
+    type: effort_controllers/JointPositionController
+    joint: blbase_coxa
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  fr_tibia:
+    type: effort_controllers/JointPositionController
+    joint: frcoxa_tibia
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  fl_tibia:
+    type: effort_controllers/JointPositionController
+    joint: flcoxa_tibia
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  br_tibia:
+    type: effort_controllers/JointPositionController
+    joint: brcoxa_tibia
+    pid: {p: 100.0, i: 0.01, d: 0.1}
+  bl_tibia:
+    type: effort_controllers/JointPositionController
+    joint: blcoxa_tibia
+    pid: {p: 100.0, i: 0.01, d: 0.1}

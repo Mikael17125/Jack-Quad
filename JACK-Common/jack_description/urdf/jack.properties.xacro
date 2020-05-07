@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="www.github.com">
+
+    <xacro:include filename="$(find jack_description)/urdf/jack.inertial.xacro" />
+    <xacro:include filename="$(find jack_description)/urdf/jack.transmision.xacro" />
+
+    <xacro:macro name="jack_base" params="name origin_rpy origin_xyz size">
+        <link name="${name}">
+            <visual>
+                <origin rpy="${origin_rpy}" xyz="${origin_xyz}" />
+                <geometry>
+                    <box size="${size}" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin rpy="${origin_rpy}" xyz="${origin_xyz}" />
+                <geometry>
+                    <box size="${size}" />
+                </geometry>
+            </collision>
+            <base_inertial />
+        </link>
+        <gazebo reference="${name}">
+            <mu1 value="200.0" />
+            <mu2 value="100.0" />
+            <kp value="1000000" />
+            <kd value="1.0" />
+            <selfCollide value="false" />
+            <gravity>true</gravity>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name="jack_coxa" params="name">
+
+        <link name="${name}">
+            <visual>
+                <origin rpy="0 0 0" xyz="0 -0.05 0" />
+                <geometry>
+                    <box size="0.01 0.1 0.01" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin rpy="0 0 0" xyz="0 -0.05 0" />
+                <geometry>
+                    <box size="0.01 0.1 0.01" />
+                </geometry>
+            </collision>
+            <coxa_inertial />
+        </link>
+        <gazebo reference="${name}">
+            <mu1 value="200.0" />
+            <mu2 value="100.0" />
+            <kp value="1000000" />
+            <kd value="1.0" />
+            <selfCollide value="false" />
+            <gravity>true</gravity>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name="jack_tibia" params="name">
+        <link name="${name}">
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0.05 0" />
+                <geometry>
+                    <box size="0.01 0.1 0.01" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin rpy="0 0 0" xyz="0 0.05 0" />
+                <geometry>
+                    <box size="0.01 0.1 0.01" />
+                </geometry>
+            </collision>
+            <tibia_inertial />
+        </link>
+        <gazebo reference="${name}">
+            <mu1 value="200.0" />
+            <mu2 value="100.0" />
+            <kp value="1000000" />
+            <kd value="1.0" />
+            <selfCollide value="false" />
+            <gravity>true</gravity>
+        </gazebo>
+
+    </xacro:macro>
+
+</robot>

@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+
+<robot name="jack" xmlns:xacro="www.github.com">
+
+    <xacro:include filename="$(find jack_description)/urdf/jack.properties.xacro" />
+    <xacro:include filename="$(find jack_description)/urdf/jack.transmision.xacro" />
+
+    <link name="dummy" />
+    <joint name="dummy" type="fixed">
+        <parent link="dummy" />
+        <child link="base_link" />
+        <origin rpy="0 0 0" xyz="0 0 0" />
+    </joint>
+
+    <jack_base name="base_link" origin_rpy="0 0 0" origin_xyz="0 0 0" size="0.125 0.3 0.025" />
+    <jack_coxa name="fr_coxa" />
+    <jack_coxa name="fl_coxa" />
+    <jack_coxa name="br_coxa" />
+    <jack_coxa name="bl_coxa" />
+    <jack_tibia name="fr_tibia" />
+    <jack_tibia name="fl_tibia" />
+    <jack_tibia name="br_tibia" />
+    <jack_tibia name="bl_tibia" />
+
+    <jack_joint name="frbase_coxa" axis="1 0 0" origin_xyz="0.0775 0.15 0" parent="base_link" child="fr_coxa" />
+    <jack_joint name="flbase_coxa" axis="1 0 0" origin_xyz="-0.0775 0.15 0" parent="base_link" child="fl_coxa" />
+    <jack_joint name="brbase_coxa" axis="1 0 0" origin_xyz="0.0775 -0.1 0" parent="base_link" child="br_coxa" />
+    <jack_joint name="blbase_coxa" axis="1 0 0" origin_xyz="-0.0775 -0.1 0" parent="base_link" child="bl_coxa" />
+
+    <jack_joint name="frcoxa_tibia" axis="1 0 0" origin_xyz="-0.01 -0.1 0" parent="fr_coxa" child="fr_tibia" />
+    <jack_joint name="flcoxa_tibia" axis="1 0 0" origin_xyz="0.01 -0.1 0" parent="fl_coxa" child="fl_tibia" />
+    <jack_joint name="brcoxa_tibia" axis="1 0 0" origin_xyz="-0.01 -0.1 0" parent="br_coxa" child="br_tibia" />
+    <jack_joint name="blcoxa_tibia" axis="1 0 0" origin_xyz="0.01 -0.1 0" parent="bl_coxa" child="bl_tibia" />
+
+    <gazebo>
+        <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+            <robotNamespace>/jack</robotNamespace>
+            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+            <legacyModeNS>true</legacyModeNS>
+        </plugin>
+    </gazebo>
+
+</robot>

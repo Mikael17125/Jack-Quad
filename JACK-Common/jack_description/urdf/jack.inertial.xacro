@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="www.github.com">
+
+    <xacro:macro name="base_inertial">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <mass value="1" />
+            <inertia ixx="0.0070800781250" ixy="-0.0000000000" ixz="0.0000000000" iyx="-0.00000000000" iyy="0.0012695312500" iyz="0.0000000001" izx="0.00000000000" izy="0.0000000000" izz="0.0082519531250" />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="coxa_inertial">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <mass value="1" />
+            <inertia ixx="0.00084166672" ixy="-0.0000000006" ixz="-0.0000000000" iyx="-0.00000000006" iyy="0.00001666667" iyz="-0.0000000001" izx="-0.00000000000" izy="-0.0000000001" izz="0.00084166702" />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="tibia_inertial">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <mass value="1" />
+            <inertia ixx="0.00084166672" ixy="-0.0000000006" ixz="-0.0000000000" iyx="-0.00000000006" iyy="0.00001666667" iyz="-0.0000000001" izx="-0.00000000000" izy="-0.0000000001" izz="0.00084166702" />
+        </inertial>
+    </xacro:macro>
+
+</robot>

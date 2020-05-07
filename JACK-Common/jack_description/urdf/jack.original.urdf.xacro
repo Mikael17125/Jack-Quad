@@ -1,0 +1,413 @@
+<?xml version="1.0" ?>
+
+<robot name="jack" xmlns:xacro="www.github.com">
+    <link name="dummy" />
+    <joint name="dummy" type="fixed">
+        <parent link="dummy" />
+        <child link="base_link" />
+        <origin rpy="0 0 0" xyz="0 0 0" />
+    </joint>
+
+    <link name="base_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <geometry>
+                <box size="0.125 0.3 0.025" />
+            </geometry>
+            <material name="Grey">
+                <color rgba="0.20 0.20 0.20 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <geometry>
+                <box size="0.125 0.3 0.025" />
+            </geometry>
+        </collision>
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <mass value="1.5" />
+            <inertia ixx="0.011328125" ixy="0.0" ixz="0.0" iyy="0.00203125" iyz="0.0" izz="0.013203125" />
+        </inertial>
+    </link>
+
+    <gazebo reference="base_link">
+        <mu1 value="2000.0" />
+        <mu2 value="1000.0" />
+        <kp value="1000000" />
+        <kd value="1.0" />
+    </gazebo>
+
+    <joint name="frbase_coxa" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="0" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="0.0775 0.15 0" />
+        <parent link="base_link" />
+        <child link="fr_coxa" />
+    </joint>
+    <transmission name="t_frbase_coxa">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="frbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_frbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="fr_coxa">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="fr_coxa">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+    <joint name="flbase_coxa" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="0" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="-0.0775 0.15 0" />
+        <parent link="base_link" />
+        <child link="fl_coxa" />
+    </joint>
+    <transmission name="t_flbase_coxa">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="flbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_flbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="fl_coxa">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="fl_coxa">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+
+    <joint name="brbase_coxa" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="0" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="0.0775 -0.1 0" />
+        <parent link="base_link" />
+        <child link="br_coxa" />
+    </joint>
+    <transmission name="t_brbase_coxa">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="brbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_brbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="br_coxa">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="br_coxa">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+
+    <joint name="blbase_coxa" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="0" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="-0.0775 -0.1 0" />
+        <parent link="base_link" />
+        <child link="bl_coxa" />
+    </joint>
+    <transmission name="t_blbase_coxa">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="blbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_blbase_coxa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="bl_coxa">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 -0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="bl_coxa">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+
+    <joint name="frcoxa_tibia" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="-0.01 -0.1 0" />
+        <parent link="fr_coxa" />
+        <child link="fr_tibia" />
+    </joint>
+    <transmission name="t_frcoxa_tibia">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="frcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_frcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="fr_tibia">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="fr_tibia">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+    
+
+    <joint name="flcoxa_tibia" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="0.01 -0.1 0" />
+        <parent link="fl_coxa" />
+        <child link="fl_tibia" />
+    </joint>
+    <transmission name="t_flcoxa_tibia">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="flcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_flcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="fl_tibia">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="fl_tibia">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+    <joint name="brcoxa_tibia" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="-0.01 -0.1 0" />
+        <parent link="br_coxa" />
+        <child link="br_tibia" />
+    </joint>
+    <transmission name="t_brcoxa_tibia">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="brcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_brcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="br_tibia">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="br_tibia">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+    <joint name="blcoxa_tibia" type="revolute">
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5" />
+        <origin rpy="0 0 0" xyz="0.01 -0.1 0" />
+        <parent link="bl_coxa" />
+        <child link="bl_tibia" />
+    </joint>
+    <transmission name="t_blcoxa_tibia">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="blcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="m_blcoxa_tibia">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="bl_tibia">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <geometry>
+                <box size="0.01 0.1 0.01" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0.05 0" />
+            <inertia ixx="0.00008416666" ixy="0.0" ixz="0.0" iyy="0.00000166666" iyz="0.0" izz="0.00008416666" />
+        </inertial>
+    </link>
+    <gazebo reference="bl_tibia">
+        <mu1 value="2000.0"/>
+        <mu2 value="1000.0"/>
+        <kp value="1000000" />
+        <kd value="1.0" />
+        <selfCollide value="true" />
+      </gazebo>
+
+    <gazebo>
+        <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+            <robotNamespace>/jack</robotNamespace>
+            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        </plugin>
+    </gazebo>
+
+</robot>
