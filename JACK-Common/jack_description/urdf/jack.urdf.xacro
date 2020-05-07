@@ -27,10 +27,10 @@
     <jack_joint name="brbase_coxa" axis="1 0 0" origin_xyz="0.0775 -0.1 0" parent="base_link" child="br_coxa" />
     <jack_joint name="blbase_coxa" axis="1 0 0" origin_xyz="-0.0775 -0.1 0" parent="base_link" child="bl_coxa" />
 
-    <jack_joint name="frcoxa_tibia" axis="1 0 0" origin_xyz="-0.01 -0.1 0" parent="fr_coxa" child="fr_tibia" />
-    <jack_joint name="flcoxa_tibia" axis="1 0 0" origin_xyz="0.01 -0.1 0" parent="fl_coxa" child="fl_tibia" />
-    <jack_joint name="brcoxa_tibia" axis="1 0 0" origin_xyz="-0.01 -0.1 0" parent="br_coxa" child="br_tibia" />
-    <jack_joint name="blcoxa_tibia" axis="1 0 0" origin_xyz="0.01 -0.1 0" parent="bl_coxa" child="bl_tibia" />
+    <jack_joint name="frcoxa_tibia" axis="-1 0 0" origin_xyz="-0.01 -0.1 0" parent="fr_coxa" child="fr_tibia" />
+    <jack_joint name="flcoxa_tibia" axis="-1 0 0" origin_xyz="0.01 -0.1 0" parent="fl_coxa" child="fl_tibia" />
+    <jack_joint name="brcoxa_tibia" axis="-1 0 0" origin_xyz="-0.01 -0.1 0" parent="br_coxa" child="br_tibia" />
+    <jack_joint name="blcoxa_tibia" axis="-1 0 0" origin_xyz="0.01 -0.1 0" parent="bl_coxa" child="bl_tibia" />
 
     <gazebo>
         <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">

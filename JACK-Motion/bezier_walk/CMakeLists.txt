@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   jack_framework_common
   jack_controller
   cmake_modules
+  eigen_conversions
 )
 
 find_package(Boost REQUIRED)
@@ -21,6 +22,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES bezier_walk
   CATKIN_DEPENDS geometry_msgs roscpp std_msgs jack_framework_common cmake_modules jack_controller
+  DEPENDS Boost EIGEN3
 )
 
 include_directories(
@@ -44,3 +46,17 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
    ${Eigen3_LIBRARIES}
    ${Boost_LIBRARIES}
  )
+
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY config
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

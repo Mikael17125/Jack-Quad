@@ -55,6 +55,7 @@
   <depend>jack_framework_common</depend>
   <depend>jack_controller</depend>
   <depend>cmake_modules</depend>
+  <depend>eigen_conversions</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
