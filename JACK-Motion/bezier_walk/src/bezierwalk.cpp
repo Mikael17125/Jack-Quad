@@ -44,57 +44,119 @@ void BezierWalk::initialize()
 
 void BezierWalk::process()
 {
-    ROS_INFO("BEZIER_WALK");
+    // ROS_INFO("BEZIER_WALK");
     servoPublish();
 }
 
 void BezierWalk::servoPublish()
 {
-    Eigen::Vector3d pos;
-    Eigen::Vector3d ori;
+    static int phase = 0;
+    static bool inc = false;
+    double time_now;
     Eigen::VectorXd joint_goal(8);
-    std_msgs::Float64 joint_msg[8];
+    static double time_start = ros::Time::now().toSec();
 
-    // double inc;
-    // static double time_start = ros::Time::now().toSec();
+    time_now = ros::Time::now().toSec() - time_start;
 
-    ori.x() = PI/18;
-    ori.y() = PI/18;
-    ori.z() = 0.0;
+    switch (phase)
+    {
+    case 0:
+        pos.x() = 0.0;
+        pos.y() = 0.0;
+        pos.z() = 0.005;
 
-    pos.x() = 0.0;
-    pos.y() = 0.0;
-    pos.z() = 0.1;
+        ori.x() = 0.0;
+        ori.y() = 0.0;
+        ori.z() = 0.0;
+
+        if (time_now > 5)
+            phase = 1;
+
+        break;
+
+    case 1:
+        if (inc)
+            pos.z() += 0.001;
+
+        if (pos.z() >= 0.11)
+            phase = 2;
+
+        break;
+
+    case 2:
+
+        if (inc)
+            ori.x() += 0.5 * DEG2RAD;
+
+        if (ori.x() >= 20 * DEG2RAD)
+            phase = 3;
+
+        break;
+
+    case 3:
+
+        if (inc)
+            ori.x() -= 0.5 * DEG2RAD;
+
+        if (ori.x() <= -20 * DEG2RAD)
+            phase = 4;
+
+        break;
+
+    case 4:
+
+        if (inc)
+            ori.x() += 0.5 * DEG2RAD;
+
+        if (ori.x() >= 0 * DEG2RAD)
+            phase = 5;
+
+        break;
+
+    case 5:
+        if (inc)
+            ori.y() += 0.5 * DEG2RAD;
+
+        if (ori.y() >= 20 * DEG2RAD)
+            phase = 6;
+
+        break;
+
+    case 6:
+        if (inc)
+            ori.y() -= 0.5 * DEG2RAD;
+
+        if (ori.y() <= -20 * DEG2RAD)
+            phase = 7;
+
+        break;
+
+    case 7:
+        if (inc)
+            ori.y() += 0.5 * DEG2RAD;
+
+        if (ori.y() >= 0 * DEG2RAD)
+            phase = 1;
+
+        break;
+    }
 
     joint_goal = ik.solve(pos, ori);
 
-    // double time_now = ros::Time::now().toSec() - time_start;
+    if (time_now > 0.02 && phase != 0)
+    {
+        inc = true;
+        time_start = ros::Time::now().toSec();
+    }
+    else
+    {
+        inc = false;
+    }
 
-    // if (time_now > 0.002)
-    // {
-    //     inc += DEG2RAD;
-    //     time_start = ros::Time::now().toSec();
-    // }
-
-    // if (inc <= 1)
-    // {
-    //     coxa_msg.data = (1 - inc) * 0 + (inc) * (coxa_goal);
-    //     tibia_msg.data = (1 - inc) * 0 + (inc) * (tibia_goal);
-    // }
-    // else
-    // {
-    //      coxa_msg.data = coxa_goal;
-    //      tibia_msg.data = tibia_goal;
-    // }
-
-    for (int i = 0; i < 8; i++){
+    for (int i = 0; i < 8; i++)
+    {
         ROS_INFO("JOINT GOAL [%f]", joint_goal(i) * RAD2DEG);
         joint_msg[i].data = joint_goal(i);
         joint_pub[i].publish(joint_msg[i]);
     }
-    
-
-
-    // ROS_INFO("JOINT COXA [%f]", coxa_msg.data);
-    // ROS_INFO("JOINT TIBIA [%f]", tibia_msg.data);
 }

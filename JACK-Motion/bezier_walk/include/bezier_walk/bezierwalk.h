@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 
-#define RAD2DEG 57.272727 //Radian to Degree
-#define DEG2RAD 0.01746031746 //Degree to Radian 
+#define RAD2DEG 57.272727     //Radian to Degree
+#define DEG2RAD 0.01746031746 //Degree to Radian
 
 using namespace Eigen;
 
@@ -37,6 +37,12 @@ private:
     boost::thread queue_thread_;
     ros::Publisher joint_pub[8];
     std::string joint_name[8];
+
+    Eigen::Vector3d pos;
+    Eigen::Vector3d ori;
+    
+    //Message
+    std_msgs::Float64 joint_msg[8];
 };
 
 #endif
