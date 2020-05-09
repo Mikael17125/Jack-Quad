@@ -45,10 +45,36 @@ void BezierWalk::initialize()
 void BezierWalk::process()
 {
     // ROS_INFO("BEZIER_WALK");
-    servoPublish();
+    loadConfig();
+    motionDemo();
 }
 
-void BezierWalk::servoPublish()
+void BezierWalk::loadConfig()
+{
+    std::string config_file = ros::package::getPath("bezier_walk") + "/config/demo.yaml";
+    YAML::Node config;
+
+    try
+    {
+        config = YAML::LoadFile(config_file);
+    }
+    catch (const std::exception &e)
+    {
+        ROS_ERROR("Fail to load yaml file.");
+        return;
+    }
+
+    YAML::Node node = config["demo"];
+
+    demo.left = node["left"].as<double>();
+    demo.right = node["right"].as<double>();
+    demo.front = node["front"].as<double>();
+    demo.back = node["back"].as<double>();
+
+    demo.speed = node["speed"].as<double>();
+}
+
+void BezierWalk::motionDemo()
 {
     static int phase = 0;
     static bool inc = false;
@@ -60,7 +86,7 @@ void BezierWalk::servoPublish()
 
     switch (phase)
     {
-    case 0:
+    case 0: //Wait untill 5s
         pos.x() = 0.0;
         pos.y() = 0.0;
         pos.z() = 0.005;
@@ -69,12 +95,12 @@ void BezierWalk::servoPublish()
         ori.y() = 0.0;
         ori.z() = 0.0;
 
-        if (time_now > 5)
+        if (time_now > 2)
             phase = 1;
 
         break;
 
-    case 1:
+    case 1: //Stand
         if (inc)
             pos.z() += 0.001;
 
@@ -83,28 +109,25 @@ void BezierWalk::servoPublish()
 
         break;
 
-    case 2:
-
+    case 2: //Front
         if (inc)
             ori.x() += 0.5 * DEG2RAD;
 
-        if (ori.x() >= 20 * DEG2RAD)
+        if (ori.x() >= demo.front * DEG2RAD)
             phase = 3;
 
         break;
 
-    case 3:
-
+    case 3: //Back
         if (inc)
             ori.x() -= 0.5 * DEG2RAD;
 
-        if (ori.x() <= -20 * DEG2RAD)
+        if (ori.x() <= demo.back * DEG2RAD)
             phase = 4;
 
         break;
 
-    case 4:
-
+    case 4: //Normal
         if (inc)
             ori.x() += 0.5 * DEG2RAD;
 
@@ -113,25 +136,25 @@ void BezierWalk::servoPublish()
 
         break;
 
-    case 5:
+    case 5: //Left
         if (inc)
             ori.y() += 0.5 * DEG2RAD;
 
-        if (ori.y() >= 20 * DEG2RAD)
+        if (ori.y() >= demo.left * DEG2RAD)
             phase = 6;
 
         break;
 
-    case 6:
+    case 6: //Right
         if (inc)
             ori.y() -= 0.5 * DEG2RAD;
 
-        if (ori.y() <= -20 * DEG2RAD)
+        if (ori.y() <= demo.right * DEG2RAD)
             phase = 7;
 
         break;
 
-    case 7:
+    case 7: //Normal
         if (inc)
             ori.y() += 0.5 * DEG2RAD;
 
@@ -143,7 +166,7 @@ void BezierWalk::servoPublish()
 
     joint_goal = ik.solve(pos, ori);
 
-    if (time_now > 0.02 && phase != 0)
+    if (time_now > demo.speed && phase != 0)
     {
         inc = true;
         time_start = ros::Time::now().toSec();
@@ -155,7 +178,7 @@ void BezierWalk::servoPublish()
 
     for (int i = 0; i < 8; i++)
     {
-        ROS_INFO("JOINT GOAL [%f]", joint_goal(i) * RAD2DEG);
+        // ROS_INFO("JOINT GOAL [%f]", joint_goal(i) * RAD2DEG);
         joint_msg[i].data = joint_goal(i);
         joint_pub[i].publish(joint_msg[i]);
     }

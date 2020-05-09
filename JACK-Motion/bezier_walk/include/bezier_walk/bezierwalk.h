@@ -8,6 +8,7 @@
 #include <ros/callback_queue.h>
 #include <jack_framework_common/motion_module.h>
 #include <bezier_walk/IKSolver.h>
+#include "yaml-cpp/yaml.h"
 
 #include <std_msgs/Float64.h>
 
@@ -22,7 +23,17 @@
 
 using namespace Eigen;
 
-class BezierWalk : public MotionModule, public Singleton<BezierWalk>
+struct Demo
+{
+    double left;
+    double right;
+    double front;
+    double back;
+    double speed;
+};
+
+class BezierWalk : public MotionModule,
+                   public Singleton<BezierWalk>
 {
 public:
     BezierWalk();
@@ -33,16 +44,19 @@ public:
 private:
     IKSolver ik;
     void queueThread();
-    void servoPublish();
+    void loadConfig();
+    void motionDemo();
     boost::thread queue_thread_;
     ros::Publisher joint_pub[8];
     std::string joint_name[8];
 
     Eigen::Vector3d pos;
     Eigen::Vector3d ori;
-    
+
     //Message
     std_msgs::Float64 joint_msg[8];
+
+    Demo demo;
 };
 
 #endif

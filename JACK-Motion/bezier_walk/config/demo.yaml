@@ -1,0 +1,6 @@
+demo:
+  left: 40
+  right: -40
+  front: 20
+  back: -35
+  speed: 0.01

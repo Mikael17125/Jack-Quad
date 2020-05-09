@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: jack_manager
+Description: Description of jack_manager
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib -ljack_manager
+Requires: roscpp cmake_modules jack_controller jack_framework_common bezier_walk
