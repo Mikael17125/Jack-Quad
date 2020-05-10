@@ -8,6 +8,9 @@ class Trajectory
 {
 public:
     void walk();
+
+private:
+
 };
 
 #endif

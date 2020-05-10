@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: jack_controller
-Description: Description of jack_controller
-Version: 0.0.0
-Cflags: -I${prefix}/include -I/usr/include
-Libs: -L${prefix}/lib -ljack_controller
-Requires: roscpp std_msgs roslib jack_framework_common cmake_modules

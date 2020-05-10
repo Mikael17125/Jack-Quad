@@ -1,8 +1,0 @@
-prefix=/home/mikael/jack_ws/src/build/devel
-
-Name: jack_description
-Description: Description of jack_description
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
