@@ -8,6 +8,8 @@
 #include <ros/callback_queue.h>
 #include <jack_framework_common/motion_module.h>
 #include <bezier_walk/IKSolver.h>
+#include <bezier_walk/trajectory.h>
+#include <bezier_walk/kinematic.h>
 #include "yaml-cpp/yaml.h"
 
 #include <std_msgs/Float64.h>
@@ -25,10 +27,14 @@ using namespace Eigen;
 
 struct Demo
 {
-    double left;
-    double right;
-    double front;
-    double back;
+    double ori_x;
+    double ori_y;
+    double ori_z;
+
+    double pos_x;
+    double pos_y;
+    double pos_z;
+    
     double speed;
 };
 
@@ -43,6 +49,8 @@ public:
 
 private:
     IKSolver ik;
+    Trajectory traj;
+    Kinematic k;
     void queueThread();
     void loadConfig();
     void motionDemo();

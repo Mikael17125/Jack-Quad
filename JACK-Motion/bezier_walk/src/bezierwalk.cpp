@@ -66,10 +66,13 @@ void BezierWalk::loadConfig()
 
     YAML::Node node = config["demo"];
 
-    demo.left = node["left"].as<double>();
-    demo.right = node["right"].as<double>();
-    demo.front = node["front"].as<double>();
-    demo.back = node["back"].as<double>();
+    demo.pos_x = node["pos_x"].as<double>();
+    demo.pos_y = node["pos_y"].as<double>();
+    demo.pos_z = node["pos_z"].as<double>();
+
+    demo.ori_x = node["ori_x"].as<double>();
+    demo.ori_y = node["ori_y"].as<double>();
+    demo.ori_z = node["ori_z"].as<double>();
 
     demo.speed = node["speed"].as<double>();
 }
@@ -79,21 +82,27 @@ void BezierWalk::motionDemo()
     static int phase = 0;
     static bool inc = false;
     double time_now;
+    static double height_1, height_2;
     Eigen::VectorXd joint_goal(8);
+    Eigen::MatrixXd goal_pos(4, 3);
     static double time_start = ros::Time::now().toSec();
 
     time_now = ros::Time::now().toSec() - time_start;
 
+    pos.x() = demo.pos_x;
+    pos.y() = demo.pos_y;
+    pos.z() = demo.pos_z;
+
+    ori.x() = demo.ori_x * DEG2RAD;
+    ori.y() = demo.ori_y * DEG2RAD;
+    ori.z() = demo.ori_z * DEG2RAD;
+
     switch (phase)
     {
-    case 0: //Wait untill 5s
-        pos.x() = 0.0;
-        pos.y() = 0.0;
-        pos.z() = 0.005;
+    case 0: //Wait untill 2s
 
-        ori.x() = 0.0;
-        ori.y() = 0.0;
-        ori.z() = 0.0;
+        height_1 = 0.005;
+        height_2 = 0.005;
 
         if (time_now > 2)
             phase = 1;
@@ -102,69 +111,59 @@ void BezierWalk::motionDemo()
 
     case 1: //Stand
         if (inc)
-            pos.z() += 0.001;
+        {
+            height_1 += 0.0001;
+            height_2 += 0.0001;
+        }
 
-        if (pos.z() >= 0.11)
+        if (height_1 >= 0.11)
             phase = 2;
 
         break;
 
-    case 2: //Front
+    case 2: //FL BR UP
         if (inc)
-            ori.x() += 0.5 * DEG2RAD;
+            height_1 -= 0.01;
 
-        if (ori.x() >= demo.front * DEG2RAD)
+        if (height_1 <= 0.04)
             phase = 3;
 
         break;
 
-    case 3: //Back
+    case 3: //FL BR DOWN
         if (inc)
-            ori.x() -= 0.5 * DEG2RAD;
+            height_1 += 0.01;
 
-        if (ori.x() <= demo.back * DEG2RAD)
+        if (height_1 >= 0.11)
             phase = 4;
 
         break;
 
-    case 4: //Normal
+    case 4: //FR BL UP
         if (inc)
-            ori.x() += 0.5 * DEG2RAD;
+            height_2 -= 0.01;
 
-        if (ori.x() >= 0 * DEG2RAD)
+        if (height_2 <= 0.04)
             phase = 5;
 
         break;
 
-    case 5: //Left
+    case 5: //FR BL DOWN
         if (inc)
-            ori.y() += 0.5 * DEG2RAD;
+            height_2 += 0.01;
 
-        if (ori.y() >= demo.left * DEG2RAD)
-            phase = 6;
-
-        break;
-
-    case 6: //Right
-        if (inc)
-            ori.y() -= 0.5 * DEG2RAD;
-
-        if (ori.y() <= demo.right * DEG2RAD)
-            phase = 7;
-
-        break;
-
-    case 7: //Normal
-        if (inc)
-            ori.y() += 0.5 * DEG2RAD;
-
-        if (ori.y() >= 0 * DEG2RAD)
-            phase = 1;
+        if (height_2 >= 0.11)
+            phase = 2;
 
         break;
     }
 
-    joint_goal = ik.solve(pos, ori);
+    goal_pos << 0.0625, 0.15, height_1,
+        -0.0625, 0.15, height_2,
+        0.0625, -0.1, height_2,
+        -0.0625, -0.1, height_1;
+
+    joint_goal = ik.solve(pos, ori, goal_pos);
 
     if (time_now > demo.speed && phase != 0)
     {
@@ -178,7 +177,7 @@ void BezierWalk::motionDemo()
 
     for (int i = 0; i < 8; i++)
     {
-        // ROS_INFO("JOINT GOAL [%f]", joint_goal(i) * RAD2DEG);
+        // ROS_INFO("JOINT GOAL [%s] = [%f]", joint_name[i].c_str(), joint_goal(i) * RAD2DEG);
         joint_msg[i].data = joint_goal(i);
         joint_pub[i].publish(joint_msg[i]);
     }

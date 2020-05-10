@@ -1,6 +1,8 @@
 demo:
-  left: 40
-  right: -40
-  front: 20
-  back: -35
+  ori_x: 5
+  ori_y: 0
+  ori_z: 0
+  pos_x: 0.0
+  pos_y: 0.05
+  pos_z: 0.0
   speed: 0.01

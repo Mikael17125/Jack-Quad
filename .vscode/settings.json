@@ -64,5 +64,6 @@
         "eigen": "cpp",
         "random": "cpp",
         "geometry": "cpp"
-    }
+    },
+    "ros.distro": "kinetic"
 }
