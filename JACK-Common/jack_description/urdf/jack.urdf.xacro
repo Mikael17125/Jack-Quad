@@ -33,6 +33,19 @@
     <jack_joint name="blcoxa_tibia" axis="-1 0 0" origin_xyz="0.01 -0.1 0" parent="bl_coxa" child="bl_tibia" />
 
     <gazebo>
+        <plugin name="gazebo_ros_imu_controller" filename="libgazebo_ros_imu.so">
+          <robotNamespace>/jack</robotNamespace>
+          <topicName>imu</topicName>
+          <bodyName>base_link</bodyName>
+          <gaussianNoise>0</gaussianNoise>
+          <rpyOffsets>0 0 0</rpyOffsets>
+          <updateRate>50.0</updateRate>
+          <alwaysOn>true</alwaysOn>
+          <gaussianNoise>0</gaussianNoise>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
         <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
             <robotNamespace>/jack</robotNamespace>
             <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>

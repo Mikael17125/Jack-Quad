@@ -13,6 +13,7 @@
 #include "yaml-cpp/yaml.h"
 
 #include <std_msgs/Float64.h>
+#include <sensor_msgs/Imu.h>
 
 #include <eigen3/Eigen/Eigen>
 #include <Eigen/Dense>
@@ -34,6 +35,8 @@ struct Demo
     double pos_x;
     double pos_y;
     double pos_z;
+
+    double foot_height;
     
     double speed;
 };
@@ -51,15 +54,21 @@ private:
     IKSolver ik;
     Trajectory traj;
     Kinematic k;
+
     void queueThread();
     void loadConfig();
     void motionDemo();
+
+    void ImuCallback(const sensor_msgs::Imu::ConstPtr& msg);
+
     boost::thread queue_thread_;
     ros::Publisher joint_pub[8];
     std::string joint_name[8];
 
     Eigen::Vector3d pos;
     Eigen::Vector3d ori;
+
+    double roll, pitch, yaw;
 
     //Message
     std_msgs::Float64 joint_msg[8];

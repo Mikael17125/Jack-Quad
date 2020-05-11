@@ -1,8 +1,9 @@
 demo:
-  ori_x: 5
+  ori_x: 0
   ori_y: 0
   ori_z: 0
-  pos_x: 0.0
-  pos_y: 0.05
-  pos_z: 0.0
-  speed: 0.01
+  pos_x: 0
+  pos_y: 0
+  pos_z: 0
+  foot_height: 0.03
+  speed: 0.005

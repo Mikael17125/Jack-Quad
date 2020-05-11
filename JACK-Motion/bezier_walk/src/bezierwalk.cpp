@@ -17,6 +17,8 @@ void BezierWalk::queueThread()
 
     nh_.setCallbackQueue(&callback_queue);
 
+    ros::Subscriber imu_callback = nh_.subscribe("/jack/imu", 10, &BezierWalk::ImuCallback, this);
+
     for (int i = 0; i < 8; i++)
         joint_pub[i] = nh_.advertise<std_msgs::Float64>("/jack/" + joint_name[i] + "/command", 1);
 
@@ -74,6 +76,8 @@ void BezierWalk::loadConfig()
     demo.ori_y = node["ori_y"].as<double>();
     demo.ori_z = node["ori_z"].as<double>();
 
+    demo.foot_height = node["foot_height"].as<double>();
+
     demo.speed = node["speed"].as<double>();
 }
 
@@ -123,16 +127,16 @@ void BezierWalk::motionDemo()
 
     case 2: //FL BR UP
         if (inc)
-            height_1 -= 0.01;
+            height_1 -= 0.002;
 
-        if (height_1 <= 0.04)
+        if (height_1 <= 0.11 - demo.foot_height)
             phase = 3;
 
         break;
 
     case 3: //FL BR DOWN
         if (inc)
-            height_1 += 0.01;
+            height_1 += 0.002;
 
         if (height_1 >= 0.11)
             phase = 4;
@@ -141,16 +145,16 @@ void BezierWalk::motionDemo()
 
     case 4: //FR BL UP
         if (inc)
-            height_2 -= 0.01;
+            height_2 -= 0.002;
 
-        if (height_2 <= 0.04)
+        if (height_2 <= 0.11 - demo.foot_height)
             phase = 5;
 
         break;
 
     case 5: //FR BL DOWN
         if (inc)
-            height_2 += 0.01;
+            height_2 += 0.002;
 
         if (height_2 >= 0.11)
             phase = 2;
@@ -158,10 +162,10 @@ void BezierWalk::motionDemo()
         break;
     }
 
-    goal_pos << 0.0625, 0.15, height_1,
-        -0.0625, 0.15, height_2,
-        0.0625, -0.1, height_2,
-        -0.0625, -0.1, height_1;
+    goal_pos << 0.0625, 0.1, height_1,
+        -0.0625, 0.1, height_2,
+        0.0625, -0.15, height_2,
+        -0.0625, -0.15, height_1;
 
     joint_goal = ik.solve(pos, ori, goal_pos);
 
@@ -181,4 +185,32 @@ void BezierWalk::motionDemo()
         joint_msg[i].data = joint_goal(i);
         joint_pub[i].publish(joint_msg[i]);
     }
+}
+
+void BezierWalk::ImuCallback(const sensor_msgs::Imu::ConstPtr &msg)
+{
+
+    Eigen::Quaterniond imu_quarternion;
+
+    imu_quarternion.x() = msg->orientation.x;
+    imu_quarternion.y() = msg->orientation.y;
+    imu_quarternion.z() = msg->orientation.z;
+    imu_quarternion.w() = msg->orientation.w;
+
+    Eigen::Matrix3d rotation;
+
+    rotation = imu_quarternion.toRotationMatrix();
+
+    double roll = atan2(rotation.coeff(2, 1), rotation.coeff(2, 2));
+    double pitch = atan2(-rotation.coeff(2, 0), sqrt(pow(rotation.coeff(2, 1), 2) + pow(rotation.coeff(2, 2), 2)));
+    double yaw = atan2(rotation.coeff(1, 0), rotation.coeff(0, 0));
+
+    ROS_INFO("ROLL [%f]",roll * RAD2DEG);
+    ROS_INFO("PITCH [%f]", pitch * RAD2DEG);
+    ROS_INFO("YAW [%f]", yaw * RAD2DEG);
+
+    // ROS_INFO("X [%f]", imu_quarternion.x());
+    // ROS_INFO("Y [%f]", imu_quarternion.y());
+    // ROS_INFO("Z [%f]", imu_quarternion.z());
+    // ROS_INFO("W [%f]", imu_quarternion.w());
 }

@@ -74,9 +74,6 @@ Eigen::VectorXd IKSolver::solve(Eigen::Vector3d pos, Eigen::Vector3d ori, Eigen:
     tBL = transform(pos, ori) * BL;
     tBR = transform(pos, ori) * BR;
 
-    std::cout << tFL << std::endl<<std::endl;
-    std::cout << transform(pos, ori) << std::endl<<std::endl;
-
     //Coxa to Feet (New)
     goal_fl = goal_fl - tFL;
     goal_fr = goal_fr - tFR;
