@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: bezier_walk
+Description: Description of bezier_walk
+Version: 0.0.0
+Cflags: -I${prefix}/include -I/usr/include -I/usr/include/eigen3
+Libs: -L${prefix}/lib -lbezier_walk
+Requires: geometry_msgs roscpp std_msgs jack_framework_common cmake_modules jack_controller

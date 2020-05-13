@@ -1,6 +1,7 @@
 #include "bezier_walk/bezierwalk.h"
 
 BezierWalk::BezierWalk()
+    :fb_active(false)
 {
     module_name_ = "bezier_walk";
 }
@@ -48,6 +49,7 @@ void BezierWalk::process()
 {
     // ROS_INFO("BEZIER_WALK");
     loadConfig();
+    feedbackPID();
     motionDemo();
 }
 
@@ -78,7 +80,47 @@ void BezierWalk::loadConfig()
 
     demo.foot_height = node["foot_height"].as<double>();
 
+    demo.feedback = node["feedback"].as<bool>();
     demo.speed = node["speed"].as<double>();
+    demo.KP_R = node["KP_R"].as<double>();
+    demo.KP_P = node["KP_P"].as<double>();
+}
+
+void BezierWalk::feedbackPID()
+{
+    pos.x() = demo.pos_x;
+    pos.y() = demo.pos_y;
+    pos.z() = demo.pos_z;
+
+    if (demo.feedback)
+    {
+        if (std::fabs(roll) > demo.ori_x * DEG2RAD && std::fabs(roll) < 60 * DEG2RAD && fb_active)
+        {
+            ROS_INFO("FEEDBACK ACTIVE X [%f]", ori.x() * RAD2DEG);
+            ori.x() = demo.KP_R * roll;
+        }
+        else
+        {
+            ori.x() = demo.ori_x * DEG2RAD;
+        }
+
+        if (std::fabs(pitch) > demo.ori_y * DEG2RAD && std::fabs(pitch) < 60 * DEG2RAD && fb_active)
+        {
+            ROS_INFO("FEEDBACK ACTIVE Y [%f]", ori.y() * RAD2DEG);
+            ori.y() = -demo.KP_P * pitch;
+        }
+        else
+        {
+            ori.y() = demo.ori_y * DEG2RAD;
+        }
+    }
+    else
+    {
+        ori.x() = demo.ori_x * DEG2RAD;
+        ori.y() = demo.ori_y * DEG2RAD;
+    }
+
+    ori.z() = demo.ori_z * DEG2RAD;
 }
 
 void BezierWalk::motionDemo()
@@ -93,20 +135,12 @@ void BezierWalk::motionDemo()
 
     time_now = ros::Time::now().toSec() - time_start;
 
-    pos.x() = demo.pos_x;
-    pos.y() = demo.pos_y;
-    pos.z() = demo.pos_z;
-
-    ori.x() = demo.ori_x * DEG2RAD;
-    ori.y() = demo.ori_y * DEG2RAD;
-    ori.z() = demo.ori_z * DEG2RAD;
-
     switch (phase)
     {
     case 0: //Wait untill 2s
 
-        height_1 = 0.005;
-        height_2 = 0.005;
+        height_1 = 0.01;
+        height_2 = 0.01;
 
         if (time_now > 2)
             phase = 1;
@@ -116,12 +150,15 @@ void BezierWalk::motionDemo()
     case 1: //Stand
         if (inc)
         {
-            height_1 += 0.0001;
-            height_2 += 0.0001;
+            height_1 += 0.001;
+            height_2 += 0.001;
         }
 
-        if (height_1 >= 0.11)
+        if (height_1 >= 0.12)
+        {
             phase = 2;
+            fb_active = true;
+        }
 
         break;
 
@@ -129,7 +166,7 @@ void BezierWalk::motionDemo()
         if (inc)
             height_1 -= 0.002;
 
-        if (height_1 <= 0.11 - demo.foot_height)
+        if (height_1 <= 0.12 - demo.foot_height)
             phase = 3;
 
         break;
@@ -138,7 +175,7 @@ void BezierWalk::motionDemo()
         if (inc)
             height_1 += 0.002;
 
-        if (height_1 >= 0.11)
+        if (height_1 >= 0.12)
             phase = 4;
 
         break;
@@ -147,7 +184,7 @@ void BezierWalk::motionDemo()
         if (inc)
             height_2 -= 0.002;
 
-        if (height_2 <= 0.11 - demo.foot_height)
+        if (height_2 <= 0.12 - demo.foot_height)
             phase = 5;
 
         break;
@@ -156,7 +193,7 @@ void BezierWalk::motionDemo()
         if (inc)
             height_2 += 0.002;
 
-        if (height_2 >= 0.11)
+        if (height_2 >= 0.12)
             phase = 2;
 
         break;
@@ -201,16 +238,7 @@ void BezierWalk::ImuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 
     rotation = imu_quarternion.toRotationMatrix();
 
-    double roll = atan2(rotation.coeff(2, 1), rotation.coeff(2, 2));
-    double pitch = atan2(-rotation.coeff(2, 0), sqrt(pow(rotation.coeff(2, 1), 2) + pow(rotation.coeff(2, 2), 2)));
-    double yaw = atan2(rotation.coeff(1, 0), rotation.coeff(0, 0));
-
-    ROS_INFO("ROLL [%f]",roll * RAD2DEG);
-    ROS_INFO("PITCH [%f]", pitch * RAD2DEG);
-    ROS_INFO("YAW [%f]", yaw * RAD2DEG);
-
-    // ROS_INFO("X [%f]", imu_quarternion.x());
-    // ROS_INFO("Y [%f]", imu_quarternion.y());
-    // ROS_INFO("Z [%f]", imu_quarternion.z());
-    // ROS_INFO("W [%f]", imu_quarternion.w());
+    roll = atan2(rotation.coeff(2, 1), rotation.coeff(2, 2));
+    pitch = atan2(-rotation.coeff(2, 0), sqrt(pow(rotation.coeff(2, 1), 2) + pow(rotation.coeff(2, 2), 2)));
+    yaw = atan2(rotation.coeff(1, 0), rotation.coeff(0, 0));
 }

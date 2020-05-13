@@ -33,6 +33,7 @@ Eigen::Matrix4d IKSolver::transform(Eigen::Vector3d pos, Eigen::Vector3d ori)
 
 Eigen::Vector2d IKSolver::analyticIK(Eigen::Vector3d pos)
 {
+    //Documentation IK
     double Z = std::sqrt(std::pow(pos.y(), 2) + std::pow(pos.z(), 2));
 
     double A1 = (std::pow(k.COXA_LEG, 2) + std::pow(k.TIBIA_LEG, 2) - std::pow(Z, 2)) / (2 * k.COXA_LEG * k.TIBIA_LEG);
