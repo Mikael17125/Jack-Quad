@@ -37,11 +37,16 @@ struct Demo
     double pos_z;
 
     double foot_height;
+    double foot_step;
+    double freq;
     bool feedback;
 
     double speed;
     double KP_R;
     double KP_P;
+
+    double KD_R;
+    double KD_P;
 };
 
 class BezierWalk : public MotionModule,
@@ -64,6 +69,8 @@ private:
     void motionDemo();
 
     void ImuCallback(const sensor_msgs::Imu::ConstPtr &msg);
+    Eigen::Vector3d bezierCurve2(double phase, Eigen::Vector3d start, Eigen::Vector3d end);
+    Eigen::Vector3d bezierCurve3(double phase, Eigen::Vector3d start, Eigen::Vector3d inter, Eigen::Vector3d end);
 
     boost::thread queue_thread_;
     ros::Publisher joint_pub[8];
@@ -72,8 +79,10 @@ private:
     Eigen::Vector3d pos;
     Eigen::Vector3d ori;
 
-    double roll, pitch, yaw;
+    Eigen::Vector3d imu, d_imu;
     bool fb_active;
+
+    Eigen::Vector3d left, right;
 
     //Message
     std_msgs::Float64 joint_msg[8];

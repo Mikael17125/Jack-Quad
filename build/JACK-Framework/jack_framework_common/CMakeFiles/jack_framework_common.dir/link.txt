@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libjack_framework_common.so -o ../../devel/lib/libjack_framework_common.so  

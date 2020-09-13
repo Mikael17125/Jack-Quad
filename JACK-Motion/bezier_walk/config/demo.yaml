@@ -2,11 +2,15 @@ demo:
   ori_x: 0
   ori_y: 0
   ori_z: 0
-  pos_x: 0
-  pos_y: 0
-  pos_z: -0.0
+  pos_x: 0.0
+  pos_y: 0.0
+  pos_z: 0.0
+  KP_R: 1.0
+  KP_P: 5.0
+  KD_R: 0.0
+  KD_P: 0.0
   feedback: true
   foot_height: 0.04
+  foot_step: -0.03
+  freq: 0.4
   speed: 0.0001
-  KP_R: 1.9
-  KP_P: 1.9

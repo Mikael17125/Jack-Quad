@@ -1,8 +1,0 @@
-prefix=/home/mikael/jack_ws/src/build/devel
-
-Name: jack_framework_common
-Description: Description of jack_framework_common
-Version: 0.0.0
-Cflags: -I/home/mikael/jack_ws/src/JACK-Framework/jack_framework_common/include
-Libs: -L${prefix}/lib -ljack_framework_common
-Requires: roscpp

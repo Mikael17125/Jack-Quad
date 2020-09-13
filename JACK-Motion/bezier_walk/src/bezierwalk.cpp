@@ -1,7 +1,7 @@
 #include "bezier_walk/bezierwalk.h"
 
 BezierWalk::BezierWalk()
-    :fb_active(false)
+    : fb_active(false)
 {
     module_name_ = "bezier_walk";
 }
@@ -79,142 +79,132 @@ void BezierWalk::loadConfig()
     demo.ori_z = node["ori_z"].as<double>();
 
     demo.foot_height = node["foot_height"].as<double>();
+    demo.foot_step = node["foot_step"].as<double>();
+    demo.freq = node["freq"].as<double>();
 
     demo.feedback = node["feedback"].as<bool>();
     demo.speed = node["speed"].as<double>();
+
     demo.KP_R = node["KP_R"].as<double>();
     demo.KP_P = node["KP_P"].as<double>();
+
+    demo.KD_R = node["KD_R"].as<double>();
+    demo.KD_P = node["KD_P"].as<double>();
 }
 
 void BezierWalk::feedbackPID()
 {
+    Eigen::Vector3d feedback;
+
+    if (demo.feedback)
+    {
+        if (std::fabs(imu.x()) > 1 * DEG2RAD && std::fabs(imu.x()) < 40 * DEG2RAD && fb_active)
+        {
+            feedback.x() = demo.KP_R * imu.x() + demo.KD_R * d_imu.x();
+        }
+        else
+        {
+            feedback.x() = 0;
+        }
+
+        if (std::fabs(imu.y()) > 1 * DEG2RAD && std::fabs(imu.y()) < 40 * DEG2RAD && fb_active)
+        {
+            feedback.y() = -1 * (demo.KP_P * imu.y() + demo.KD_P * d_imu.y());
+        }
+        else
+        {
+            feedback.y() = 0;
+        }
+
+        feedback.z() = 0;
+    }
+    else
+    {
+        feedback.x() = 0;
+        feedback.y() = 0;
+        feedback.z() = 0;
+    }
+
+    // ROS_INFO("FEEDBACK ACTIVE X [%f]", feedback.x());
+    // ROS_INFO("FEEDBACK ACTIVE Y [%f]", feedback.y());
+
     pos.x() = demo.pos_x;
     pos.y() = demo.pos_y;
     pos.z() = demo.pos_z;
 
-    if (demo.feedback)
-    {
-        if (std::fabs(roll) > demo.ori_x * DEG2RAD && std::fabs(roll) < 60 * DEG2RAD && fb_active)
-        {
-            ROS_INFO("FEEDBACK ACTIVE X [%f]", ori.x() * RAD2DEG);
-            ori.x() = demo.KP_R * roll;
-        }
-        else
-        {
-            ori.x() = demo.ori_x * DEG2RAD;
-        }
-
-        if (std::fabs(pitch) > demo.ori_y * DEG2RAD && std::fabs(pitch) < 60 * DEG2RAD && fb_active)
-        {
-            ROS_INFO("FEEDBACK ACTIVE Y [%f]", ori.y() * RAD2DEG);
-            ori.y() = -demo.KP_P * pitch;
-        }
-        else
-        {
-            ori.y() = demo.ori_y * DEG2RAD;
-        }
-    }
-    else
-    {
-        ori.x() = demo.ori_x * DEG2RAD;
-        ori.y() = demo.ori_y * DEG2RAD;
-    }
-
-    ori.z() = demo.ori_z * DEG2RAD;
+    ori.x() = demo.ori_x * DEG2RAD + feedback.x();
+    ori.y() = demo.ori_y * DEG2RAD + feedback.y();
+    ori.z() = demo.ori_z * DEG2RAD + feedback.z();
 }
 
 void BezierWalk::motionDemo()
 {
-    static int phase = 0;
+    static double phase_one = 0;
+    static double phase_two = 0;
+    static bool delay;
+    static int support = 0;
     static bool inc = false;
     double time_now;
-    static double height_1, height_2;
     Eigen::VectorXd joint_goal(8);
     Eigen::MatrixXd goal_pos(4, 3);
     static double time_start = ros::Time::now().toSec();
 
     time_now = ros::Time::now().toSec() - time_start;
 
-    switch (phase)
+    if (phase_one > 1)
+        time_start = ros::Time::now().toSec();
+
+    phase_one = time_now / demo.freq;
+
+    if (phase_one < 0.5)
+        phase_two = ((time_now + (demo.freq / 2)) / demo.freq);
+    else
+        phase_two = ((time_now - (demo.freq / 2)) / demo.freq);
+
+    // left = bezierCurve3(phase_one, Eigen::Vector3d(0.0, 0.0, 0.1), Eigen::Vector3d(demo.foot_step, 0.0, 0.1 + demo.foot_height), Eigen::Vector3d(0.0, 0.0, 0.1));
+    // right = bezierCurve3(phase_two, Eigen::Vector3d(0.0, 0.0, 0.1), Eigen::Vector3d(demo.foot_step, 0.0, 0.1 + demo.foot_height), Eigen::Vector3d(0.0, 0.0, 0.1));
+
+    switch (support)
     {
-    case 0: //Wait untill 2s
+    case 0:
+        // ROS_ERROR("AAAAAAAAAAAAAAAAAAAAAA");
+        left = bezierCurve3(phase_one, Eigen::Vector3d(0.0, 0.0, 0.1), Eigen::Vector3d(demo.foot_step / 2, 0.0, 0.1 + demo.foot_height), Eigen::Vector3d(demo.foot_step, 0.0, 0.1));
+        right = bezierCurve3(phase_one, Eigen::Vector3d(demo.foot_step, 0.0, 0.1), Eigen::Vector3d(demo.foot_step / 2, 0.0, 0.1), Eigen::Vector3d(0.0, 0.0, 0.1));
 
-        height_1 = 0.01;
-        height_2 = 0.01;
+        if (phase_one < 1)
+            delay = false;
 
-        if (time_now > 2)
-            phase = 1;
-
-        break;
-
-    case 1: //Stand
-        if (inc)
+        if (phase_one > 1 && !delay)
         {
-            height_1 += 0.001;
-            height_2 += 0.001;
-        }
-
-        if (height_1 >= 0.12)
-        {
-            phase = 2;
-            fb_active = true;
+            delay = true;
+            support = 1;
         }
 
         break;
 
-    case 2: //FL BR UP
-        if (inc)
-            height_1 -= 0.002;
+    case 1:
+        // ROS_ERROR("BBBBBBBBBBBBBBBBBBBBBBB");
+        left = bezierCurve3(phase_one, Eigen::Vector3d(demo.foot_step, 0.0, 0.1), Eigen::Vector3d(demo.foot_step / 2, 0.0, 0.1), Eigen::Vector3d(0.0, 0.0, 0.1));
+        right = bezierCurve3(phase_one, Eigen::Vector3d(0.0, 0.0, 0.1), Eigen::Vector3d(demo.foot_step / 2, 0.0, 0.1 + demo.foot_height), Eigen::Vector3d(demo.foot_step, 0.0, 0.1));
 
-        if (height_1 <= 0.12 - demo.foot_height)
-            phase = 3;
+        if (phase_one < 1)
+            delay = false;
 
-        break;
-
-    case 3: //FL BR DOWN
-        if (inc)
-            height_1 += 0.002;
-
-        if (height_1 >= 0.12)
-            phase = 4;
-
-        break;
-
-    case 4: //FR BL UP
-        if (inc)
-            height_2 -= 0.002;
-
-        if (height_2 <= 0.12 - demo.foot_height)
-            phase = 5;
-
-        break;
-
-    case 5: //FR BL DOWN
-        if (inc)
-            height_2 += 0.002;
-
-        if (height_2 >= 0.12)
-            phase = 2;
+        if (phase_one > 1 && !delay)
+        {
+            delay = true;
+            support = 0;
+        }
 
         break;
     }
 
-    goal_pos << 0.0625, 0.1, height_1,
-        -0.0625, 0.1, height_2,
-        0.0625, -0.15, height_2,
-        -0.0625, -0.15, height_1;
+    goal_pos << 0.0625 + left.x(), 0.1 + left.x(), left.z(),
+        -0.0625 + right.x(), 0.1 + right.x(), right.z(),
+        0.0625 + right.x(), -0.15 + right.x(), right.z(),
+        -0.0625 + left.x(), -0.15 + left.x(), left.z();
 
     joint_goal = ik.solve(pos, ori, goal_pos);
-
-    if (time_now > demo.speed && phase != 0)
-    {
-        inc = true;
-        time_start = ros::Time::now().toSec();
-    }
-    else
-    {
-        inc = false;
-    }
 
     for (int i = 0; i < 8; i++)
     {
@@ -238,7 +228,33 @@ void BezierWalk::ImuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 
     rotation = imu_quarternion.toRotationMatrix();
 
-    roll = atan2(rotation.coeff(2, 1), rotation.coeff(2, 2));
-    pitch = atan2(-rotation.coeff(2, 0), sqrt(pow(rotation.coeff(2, 1), 2) + pow(rotation.coeff(2, 2), 2)));
-    yaw = atan2(rotation.coeff(1, 0), rotation.coeff(0, 0));
+    imu.x() = atan2(rotation.coeff(2, 1), rotation.coeff(2, 2));
+    imu.y() = atan2(-rotation.coeff(2, 0), sqrt(pow(rotation.coeff(2, 1), 2) + pow(rotation.coeff(2, 2), 2)));
+    imu.z() = atan2(rotation.coeff(1, 0), rotation.coeff(0, 0));
+
+    d_imu.x() = msg->angular_velocity.x;
+    d_imu.y() = msg->angular_velocity.y;
+    d_imu.z() = msg->angular_velocity.z;
+}
+
+Eigen::Vector3d BezierWalk::bezierCurve2(double phase, Eigen::Vector3d start, Eigen::Vector3d end)
+{
+    Eigen::Vector3d result;
+
+    result(0) = (1 - phase) * start(0) + phase * end(0);
+    result(1) = (1 - phase) * start(1) + phase * end(1);
+    result(2) = (1 - phase) * start(2) + phase * end(2);
+
+    return result;
+}
+
+Eigen::Vector3d BezierWalk::bezierCurve3(double phase, Eigen::Vector3d start, Eigen::Vector3d inter, Eigen::Vector3d end)
+{
+    Eigen::Vector3d result;
+
+    result(0) = std::pow((1 - phase), 2) * start(0) + 2 * (1 - phase) * phase * inter(0) + std::pow(phase, 2) * end(0);
+    result(1) = std::pow((1 - phase), 2) * start(1) + 2 * (1 - phase) * phase * inter(1) + std::pow(phase, 2) * end(1);
+    result(2) = std::pow((1 - phase), 2) * start(2) + 2 * (1 - phase) * phase * inter(2) + std::pow(phase, 2) * end(2);
+
+    return result;
 }
